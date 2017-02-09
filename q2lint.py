@@ -36,8 +36,8 @@ def main():
 
         for package in npm_packages:
             pkg_path, _ = os.path.split(package)
-            cmd = 'cd %s; npm i; npm run build; git diff --quiet || '\
-                  '(git checkout -- .; bash -c "exit -1")' % pkg_path
+            cmd = 'cd %s; npm i; npm run build; git diff --quiet */bundle.js' \
+                  ' || bash -c "exit -1"; git checkout -- .' % pkg_path
             if subprocess.run(cmd, shell=True).returncode != 0:
                 errors.append('npm build error on %s' % pkg_path)
 
