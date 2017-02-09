@@ -8,6 +8,7 @@
 
 import pathlib
 import sys
+import glob
 
 
 def main():
@@ -26,6 +27,19 @@ def main():
             header = ''.join(line for _, line in zip(range(7), filehandle))
             if header != HEADER:
                 errors.append('Invalid header: %s' % filepath)
+
+    npm_packages = filter(lambda x: 'node_modules' not in x,
+                          glob.glob('**/*/package.json', recursive=True))
+    if npm_packages:
+        import subprocess
+        import os
+
+        for package in npm_packages:
+            pkg_path, _ = os.path.split(package)
+            cmd = 'cd %s; npm i; npm run build; git diff --quiet || '\
+                  '(git checkout -- .; bash -c "exit -1")' % pkg_path
+            if subprocess.run(cmd, shell=True).returncode != 0:
+                errors.append('npm build error on %s' % pkg_path)
 
     if errors:
         sys.exit('\n'.join(errors))
