@@ -36,13 +36,17 @@ def main():
 
         for package in npm_packages:
             pkg_path, _ = os.path.split(package)
-            cmd = 'cd %s; npm i; npm run build; git diff --quiet */bundle.js' \
-                  ' || bash -c "exit -1"; git checkout -- .' % pkg_path
-            if subprocess.run(cmd, shell=True).returncode != 0:
-                errors.append('npm build error on %s' % pkg_path)
+            cmd = 'cd %s && npm i && npm run build -- --bail && (git diff ' \
+                  '--quiet */bundle.js || bash -c "exit 42")' % pkg_path
+            res = subprocess.run(cmd, shell=True)
+            if res.returncode == 42:
+                errors.append('Bundle is not up to date for %s' % pkg_path)
+            elif res.returncode != 0:
+                errors.append('npm build error on %s\n%s' %
+                              (pkg_path, res.stderr))
 
     if errors:
-        sys.exit('\n'.join(errors))
+        sys.exit('\n\n\033[91m%s\033[0m\n\n' % '\n'.join(errors))
 
 
 HEADER = """\
