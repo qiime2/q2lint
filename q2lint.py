@@ -8,7 +8,6 @@
 
 import pathlib
 import sys
-import glob
 
 
 def main():
@@ -28,14 +27,13 @@ def main():
             if header != HEADER:
                 errors.append('Invalid header: %s' % filepath)
 
-    npm_packages = filter(lambda x: 'node_modules' not in x,
-                          glob.glob('**/*/package.json', recursive=True))
+    npm_packages = filter(lambda x: 'node_modules' not in str(x),
+                          pathlib.Path('.').glob('**/*/package.json'))
     if npm_packages:
         import subprocess
-        import os
 
         for package in npm_packages:
-            pkg_path, _ = os.path.split(package)
+            pkg_path = package.parent
             cmd = 'cd %s && npm i && npm run build -- --bail && (git diff ' \
                   '--quiet */bundle.js || bash -c "exit 42")' % pkg_path
             res = subprocess.run(cmd, shell=True)
