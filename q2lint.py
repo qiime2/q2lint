@@ -22,6 +22,10 @@ def main():
         errors.append('Missing LICENSE file')
 
     for filepath in pathlib.Path('.').glob('**/*.py'):
+        if str(filepath).startswith('build/'):
+            continue
+        if filepath.name in ('_version.py', 'versioneer.py'):
+            continue
         with filepath.open('r') as filehandle:
             header = ''.join(line for _, line in zip(range(7), filehandle))
             if header != HEADER:
