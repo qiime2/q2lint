@@ -31,8 +31,24 @@ def main():
             if header != HEADER:
                 errors.append('Invalid header: %s' % filepath)
 
+    npm_packages = filter(lambda x: 'node_modules' not in str(x),
+                          pathlib.Path('.').glob('**/*/package.json'))
+    if npm_packages:
+        import subprocess
+
+        for package in npm_packages:
+            pkg_path = package.parent
+            cmd = 'cd %s && npm i && npm run build -- --bail && (git diff ' \
+                  '--quiet */bundle.js || bash -c "exit 42")' % pkg_path
+            res = subprocess.run(cmd, shell=True)
+            if res.returncode == 42:
+                errors.append('Bundle is out of sync for %s' % pkg_path)
+            elif res.returncode != 0:
+                errors.append('npm build error on %s\n%s' %
+                              (pkg_path, res.stderr))
+
     if errors:
-        sys.exit('\n'.join(errors))
+        sys.exit('\n\n\033[91m%s\033[0m\n\n' % '\n'.join(errors))
 
 
 HEADER = """\
