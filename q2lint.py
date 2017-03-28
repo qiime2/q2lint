@@ -38,7 +38,7 @@ def main():
                   '--quiet */bundle.js || bash -c "exit 42")' % pkg_path
             res = subprocess.run(cmd, shell=True)
             if res.returncode == 42:
-                errors.append('Bundle is not up to date for %s' % pkg_path)
+                errors.append('Bundle is out of sync for %s' % pkg_path)
             elif res.returncode != 0:
                 errors.append('npm build error on %s\n%s' %
                               (pkg_path, res.stderr))
