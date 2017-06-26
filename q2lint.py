@@ -33,7 +33,6 @@ def main():
 
     npm_packages = filter(lambda x: 'node_modules' not in str(x),
                           pathlib.Path('.').glob('**/*/package.json'))
-
     if npm_packages:
         import subprocess
         import os
