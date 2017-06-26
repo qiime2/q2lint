@@ -33,13 +33,21 @@ def main():
 
     npm_packages = filter(lambda x: 'node_modules' not in str(x),
                           pathlib.Path('.').glob('**/*/package.json'))
+
     if npm_packages:
         import subprocess
+        import os
 
         for package in npm_packages:
             pkg_path = package.parent
-            cmd = 'cd %s && npm i && npm run build -- --bail && (git diff ' \
-                  '--quiet */bundle.js || bash -c "exit 42")' % pkg_path
+            install = 'cd %s && npm i' % pkg_path
+            cmd = subprocess.run(install, shell=True,
+                                 stdout=open(os.devnull, 'wb'))
+            if cmd.returncode != 0:
+                errors.append('npm install failed: %s' % cmd.stderr)
+                continue
+            cmd = 'npm run build -- --bail && (git diff ' \
+                  '--quiet */bundle.js || bash -c "exit 42")'
             res = subprocess.run(cmd, shell=True)
             if res.returncode == 42:
                 errors.append('Bundle is out of sync for %s' % pkg_path)
