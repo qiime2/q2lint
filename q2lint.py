@@ -39,7 +39,7 @@ def main():
 
         for package in npm_packages:
             pkg_path = package.parent
-            install = 'cd %s && npm i --logLevel silent' % pkg_path
+            install = 'cd %s && npm i --silent' % pkg_path
             cmd = subprocess.run(install, shell=True,
                                  stdout=open(os.devnull, 'wb'))
             if cmd.returncode != 0:
