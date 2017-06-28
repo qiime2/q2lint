@@ -33,15 +33,11 @@ def main():
             if filepath.name != 'setup.py':
                 continue
             text = filehandle.read()
-            if 'install_requires' in text:
-                import re
-                pattern = 'install_requires=(.*\n)'
-                matches = [str("install_requires=%s ..." % match.rstrip())
-                           for match in re.findall(pattern, text)]
-                matches = "\n".join(matches)
-                errors.append('Package dependencies should be stored in '
-                              'conda recipes, not in setup.py: %s'
-                              % matches)
+            if ('install_requires' in text and
+               'install_requires=[]' not in text):
+                errors.append("Package dependencies should be stored in a "
+                              "conda recipe instead of setup.py "
+                              "`install_requires`.")
 
     npm_packages = filter(lambda x: 'node_modules' not in str(x),
                           pathlib.Path('.').glob('**/*/package.json'))
