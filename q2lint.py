@@ -30,6 +30,14 @@ def main():
             header = ''.join(line for _, line in zip(range(7), filehandle))
             if header != HEADER:
                 errors.append('Invalid header: %s' % filepath)
+            if filepath.name != 'setup.py':
+                continue
+            text = filehandle.read()
+            if ('install_requires' in text and
+               'install_requires=[]' not in text):
+                errors.append("Package dependencies should be stored in a "
+                              "conda recipe instead of setup.py "
+                              "`install_requires`.")
 
     npm_packages = filter(lambda x: 'node_modules' not in str(x),
                           pathlib.Path('.').glob('**/*/package.json'))
