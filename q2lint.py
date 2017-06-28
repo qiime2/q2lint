@@ -45,7 +45,7 @@ def main():
                 errors.append('npm install failed')
             cmd = 'cd %s && npm run build -- --bail && (git diff ' \
                   '--quiet */bundle.js || bash -c "exit 42")' % pkg_path
-            res = subprocess.run(cmd, shell=True)
+            res = subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
             if res.returncode == 42:
                 errors.append('Bundle is out of sync for %s' % pkg_path)
             elif res.returncode != 0:
