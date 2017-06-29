@@ -49,8 +49,7 @@ def main():
             if res.returncode == 42:
                 errors.append('Bundle is out of sync for %s' % pkg_path)
             elif res.returncode != 0:
-                errors.append('npm build error on %s\n%s' %
-                              (pkg_path, res.stderr))
+                errors.append('npm build error on %s' % pkg_path)
 
     if errors:
         sys.exit('\n\n\033[91m%s\033[0m\n\n' % '\n'.join(errors))
