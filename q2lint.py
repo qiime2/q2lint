@@ -38,6 +38,9 @@ def main():
                 errors.append("Package dependencies should be stored in a "
                               "conda recipe instead of setup.py "
                               "`install_requires`.")
+            if ('license=\'BSD-3-Clause\',' not in text and
+               'license=\"BSD-3-Clause\",' not in text):
+                errors.append("Missing BSD-3-Clause license in setup.py")
 
     npm_packages = filter(lambda x: 'node_modules' not in str(x),
                           pathlib.Path('.').glob('**/*/package.json'))
