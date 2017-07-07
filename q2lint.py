@@ -6,11 +6,18 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import argparse
 import pathlib
 import sys
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--disable-install-requires-check',
+                        dest='install_requires', action='store_false')
+    parser.set_defaults(install_requires=True)
+    args = parser.parse_args()
+
     license = pathlib.Path('LICENSE')
     LICENSE = pathlib.Path(__file__).parent / 'LICENSE'
 
@@ -33,7 +40,7 @@ def main():
             if filepath.name != 'setup.py':
                 continue
             text = filehandle.read()
-            if ('install_requires' in text and
+            if (args.install_requires and 'install_requires' in text and
                'install_requires=[]' not in text):
                 errors.append("Package dependencies should be stored in a "
                               "conda recipe instead of setup.py "
