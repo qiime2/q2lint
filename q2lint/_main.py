@@ -19,7 +19,8 @@ def main():
     args = parser.parse_args()
 
     license = pathlib.Path('LICENSE')
-    LICENSE = pathlib.Path(__file__).parent / 'LICENSE'
+    license_dir = pathlib.Path(__file__) / pathlib.Path('../..')
+    LICENSE = license_dir.resolve() / 'LICENSE'
 
     errors = []
     if license.exists():
