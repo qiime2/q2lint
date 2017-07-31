@@ -18,5 +18,6 @@ setup(
         [console_scripts]
         q2lint=q2lint._main:main
     ''',
-    data_files=[('.', ['LICENSE'])],
+    zip_safe=False,
+    package_data={'q2lint': ['REF_LICENSE']},
 )
