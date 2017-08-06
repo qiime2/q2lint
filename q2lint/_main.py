@@ -19,7 +19,7 @@ def main():
     args = parser.parse_args()
 
     license = pathlib.Path('LICENSE')
-    LICENSE = pathlib.Path(__file__).parent / 'LICENSE'
+    LICENSE = pathlib.Path(__file__).parent / 'REF_LICENSE'
 
     errors = []
     if license.exists():
