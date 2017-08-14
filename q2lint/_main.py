@@ -9,21 +9,26 @@
 import argparse
 import pathlib
 import sys
+import datetime
 
 
 def main():
+    license_date_range = '2016-%d' % datetime.datetime.now().year
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--disable-install-requires-check',
                         dest='install_requires', action='store_false')
-    parser.set_defaults(install_requires=True)
+    parser.add_argument('--license-date', dest='license_date', type=str)
+    parser.set_defaults(install_requires=True, license_date=license_date_range)
     args = parser.parse_args()
 
     license = pathlib.Path('LICENSE')
     LICENSE = pathlib.Path(__file__).parent / 'REF_LICENSE'
+    LICENSE = LICENSE.read_text().format(license_date=args.license_date)
 
     errors = []
     if license.exists():
-        if license.read_text() != LICENSE.read_text():
+        if license.read_text() != LICENSE:
             errors.append('Invalid LICENSE file')
     else:
         errors.append('Missing LICENSE file')
