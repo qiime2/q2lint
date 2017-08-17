@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import itertools
 import argparse
 import datetime
 import pathlib
@@ -17,8 +18,9 @@ YEAR_PLACEHOLDER = "COPYRIGHT_YEARS"  # chosen to avoid re.escape replacement
 
 
 def check_license(license, reference, copyright_idx):
-    for idx, (line, ref) in enumerate(zip(license.splitlines(),
-                                          reference.splitlines())):
+    for idx, (line, ref) in enumerate(
+            itertools.zip_longest(license.splitlines(),
+                                  reference.splitlines())):
         if idx == copyright_idx:
             curr = datetime.datetime.now().year
             # matches `2XXX-curr` or just `curr`
