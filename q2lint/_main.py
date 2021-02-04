@@ -6,15 +6,20 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import itertools
 import argparse
 import datetime
+import itertools
+import os
 import pathlib
 import sys
 import re
 
 
 YEAR_PLACEHOLDER = "COPYRIGHT_YEARS"  # chosen to avoid re.escape replacement
+
+
+def get_current_year():
+    return datetime.datetime.now().year
 
 
 def check_license(license, reference, copyright_idx):
@@ -25,7 +30,7 @@ def check_license(license, reference, copyright_idx):
             return "does not match reference"
 
         if idx == copyright_idx:
-            curr = datetime.datetime.now().year
+            curr = get_current_year()
             # matches `2XXX-curr` or just `curr`
             year_regex = '(?:2[0-9]{3}-%(curr)d|%(curr)d)' % {'curr': curr}
             line_regex = re.escape(ref).replace(YEAR_PLACEHOLDER, year_regex)
@@ -36,13 +41,55 @@ def check_license(license, reference, copyright_idx):
             return "does not match reference"
 
 
+def bump_year():
+    exclude_dirnames_regex = ('.git.*', '__pycache__', '.*egg-info')
+    for dirpath, dirnames, filename in os.walk('.', topdown=True):
+        for exclude in exclude_dirnames_regex:
+            regex = re.compile(exclude)
+            # update dirnames in place to handle actually removing
+            # ignored paths from this loop
+            dirnames[:] = [d for d in dirnames if not regex.match(d)]
+
+        for fn in filename:
+            fp = os.path.join(dirpath, fn)
+            with open(fp, 'r') as fh :
+                try:
+                    # None of our source files should be too big to read
+                    # into memory (famous last words...)
+                    contents = fh.read()
+                except UnicodeDecodeError:
+                    # Just skip binary files
+                    continue
+
+            # Credits to @ChrisKeefe && @ebolyen for this regex
+            new_contents = re.sub(
+                r'\(c\)?( )?(20[1-2][0-9])(-?20[1-2][0-9])?, QIIME 2',
+                r'(c) \2-%(curr)d, QIIME 2' % {'curr': get_current_year()},
+                contents)
+
+            # Only write out the files if something has actually changed
+            if new_contents != contents:
+                with open(fp, 'w') as fh:
+                    fh.write(new_contents)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--disable-install-requires-check',
                         dest='install_requires', action='store_false')
     parser.set_defaults(install_requires=True)
+    parser.add_argument('--update-copyright-year',
+                        dest='update_copyright_year', action='store_true')
+    parser.set_defaults(update_copyright_year=False)
     args = parser.parse_args()
 
+    if args.update_copyright_year:
+        bump_year()
+
+    validate_project(args.install_requires)
+
+
+def validate_project(install_requires):
     license = pathlib.Path('LICENSE')
     LICENSE = pathlib.Path(__file__).parent / 'REF_LICENSE'
 
@@ -68,7 +115,7 @@ def main():
             if filepath.name != 'setup.py':
                 continue
             text = filehandle.read()
-            if (args.install_requires and 'install_requires' in text and
+            if (install_requires and 'install_requires' in text and
                'install_requires=[]' not in text):
                 errors.append("Package dependencies should be stored in a "
                               "conda recipe instead of setup.py "
