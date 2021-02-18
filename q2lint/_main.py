@@ -52,7 +52,7 @@ def bump_year():
 
         for fn in filename:
             fp = os.path.join(dirpath, fn)
-            with open(fp, 'r') as fh :
+            with open(fp, 'r') as fh:
                 try:
                     # None of our source files should be too big to read
                     # into memory (famous last words...)
