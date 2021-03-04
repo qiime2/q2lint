@@ -105,7 +105,7 @@ def validate_project(install_requires):
     for filepath in pathlib.Path('.').glob('**/*.py'):
         if str(filepath).startswith('build/'):
             continue
-        if filepath.name in ('_version.py', 'versioneer.py'):
+        if filepath.name in ('_version.py', 'versioneer.py', 'manage.py'):
             continue
         with filepath.open('r') as filehandle:
             header = ''.join(line for _, line in zip(range(7), filehandle))
