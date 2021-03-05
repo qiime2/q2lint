@@ -112,7 +112,7 @@ def validate_project(install_requires):
             if re.match("^#!", header[0]):
                 header = ''.join(header[1:])
             else:
-                header = ''.join(header[:8])
+                header = ''.join(header[:7])
             reason = check_license(header, HEADER, copyright_idx=1)
             if reason:
                 errors.append('Invalid header: %s (%s)' % (filepath, reason))
