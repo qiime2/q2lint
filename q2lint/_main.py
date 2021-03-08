@@ -109,6 +109,8 @@ def validate_project(install_requires):
             continue
         with filepath.open('r') as filehandle:
             header = list(line for _, line in zip(range(8), filehandle))
+            if len(header) < 7:
+                errors.append('Invalid header: %s (%s)' % (filepath, "Header too short"))
             if re.match("^#!", header[0]):
                 header = ''.join(header[1:])
             else:
