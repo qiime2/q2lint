@@ -121,17 +121,17 @@ def validate_project(install_requires):
             reason = check_license(header, HEADER, copyright_idx=1)
             if reason:
                 errors.append('Invalid header: %s (%s)' % (filepath, reason))
-            if filepath.name != 'setup.py':
-                continue
-            text = filehandle.read()
-            if (install_requires and 'install_requires' in text and
-               'install_requires=[]' not in text):
-                errors.append("Package dependencies should be stored in a "
-                              "conda recipe instead of setup.py "
-                              "`install_requires`.")
-            if ("license='BSD-3-Clause'" not in text and
-               'license="BSD-3-Clause"' not in text):
-                errors.append("Missing BSD-3-Clause license in setup.py")
+            if filepath.name == 'setup.py':
+                filehandle.seek(0)
+                text = filehandle.read()
+                if (install_requires and 'install_requires' in text and
+                   'install_requires=[]' not in text):
+                    errors.append("Package dependencies should be stored in a "
+                                  "conda recipe instead of setup.py "
+                                  "`install_requires`.")
+                if ("license='BSD-3-Clause'" not in text and
+                   'license="BSD-3-Clause"' not in text):
+                    errors.append("Missing BSD-3-Clause license in setup.py")
 
     npm_packages = filter(lambda x: 'node_modules' not in str(x),
                           pathlib.Path('.').glob('**/*/package.json'))
