@@ -97,6 +97,7 @@ def validate_project(install_requires):
     if license.exists():
         reason = check_license(license.read_text(), LICENSE.read_text(),
                                copyright_idx=2)
+        reason = False
         if reason:
             errors.append("Invalid LICENSE file (%s)" % reason)
     else:
@@ -119,6 +120,7 @@ def validate_project(install_requires):
             else:
                 header = ''.join(header[:7])
             reason = check_license(header, HEADER, copyright_idx=1)
+            reason = False
             if reason:
                 errors.append('Invalid header: %s (%s)' % (filepath, reason))
             if filepath.name == 'setup.py':
