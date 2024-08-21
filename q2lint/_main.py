@@ -103,7 +103,8 @@ def validate_project(install_requires):
     else:
         errors.append('Missing LICENSE file')
 
-    for filepath in pathlib.Path('.').glob('**/*.py'):
+    for filepath in (pathlib.Path('.').glob('**/*.py')
+                     and pathlib.Path('.').glob('**/*.toml')):
         if str(filepath).startswith('build/'):
             continue
         if filepath.name in ('_version.py', 'versioneer.py'):
@@ -131,9 +132,12 @@ def validate_project(install_requires):
                     errors.append("Package dependencies should be stored in a "
                                   "conda recipe instead of setup.py "
                                   "`install_requires`.")
-                if ("license='BSD-3-Clause'" not in text and
-                   'license="BSD-3-Clause"' not in text):
-                    errors.append("Missing BSD-3-Clause license in setup.py")
+            elif filepath.name == 'pyproject.toml':
+                filehandle.seek(0)
+                text = filehandle.read()
+                if ("license = {file = 'LICENSE'}" not in text):
+                    errors.append(
+                        "Missing BSD-3-Clause license in pyproject.toml")
 
     npm_packages = filter(lambda x: 'node_modules' not in str(x),
                           pathlib.Path('.').glob('**/*/package.json'))
