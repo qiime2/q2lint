@@ -104,7 +104,7 @@ def validate_project(install_requires):
         errors.append('Missing LICENSE file')
 
     for filepath in (pathlib.Path('.').glob('**/*.py')
-                     and pathlib.Path('.').glob('**/*.toml')):
+                     and pathlib.Path('.').glob('**/pyproject.toml')):
         if str(filepath).startswith('build/'):
             continue
         if filepath.name in ('_version.py', 'versioneer.py'):
