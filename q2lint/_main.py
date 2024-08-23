@@ -106,8 +106,8 @@ def validate_project(install_requires):
 
     # setup some filepath shortcuts
     base_dir = pathlib.Path('.')
-    pyproject_toml = os.path.join(base_dir, 'pyproject.toml')
-    setup_py = os.path.join(base_dir, 'setup.py')
+    pyproject_toml = base_dir/'pyproject.toml'
+    setup_py = base_dir/'setup.py'
 
     # Handle license file for pyproject.toml & setup.py
     if pyproject_toml.exists():
