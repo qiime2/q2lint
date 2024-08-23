@@ -13,6 +13,7 @@ import os
 import pathlib
 import sys
 import re
+import toml
 
 
 YEAR_PLACEHOLDER = "COPYRIGHT_YEARS"  # chosen to avoid re.escape replacement
@@ -103,8 +104,29 @@ def validate_project(install_requires):
     else:
         errors.append('Missing LICENSE file')
 
-    for filepath in (pathlib.Path('.').glob('**/*.py')
-                     and pathlib.Path('.').glob('**/pyproject.toml')):
+    # setup some filepath shortcuts
+    base_dir = pathlib.Path('.')
+    pyproject_toml = os.path.join(base_dir, 'pyproject.toml')
+    setup_py = os.path.join(base_dir, 'setup.py')
+
+    # Handle license file for pyproject.toml & setup.py
+    if pyproject_toml.exists():
+        data = toml.load(pyproject_toml)
+        try:
+            license_info = data.get('project', {}).get('license', {})
+            if not license_info or license_info != {'file': 'LICENSE'}:
+                errors.append(
+                    "Missing BSD-3-Clause license in `pyproject.toml`")
+        except Exception as e:
+            errors.append(f'Error parsing `pyproject.toml`: {e}')
+    else:
+        with setup_py.open('r') as fh:
+            text = fh.read()
+            if ("license='BSD-3-Clause'" not in text and
+                    'license="BSD-3-Clause"' not in text):
+                errors.append("Missing BSD-3-Clause license in `setup.py`")
+
+    for filepath in base_dir.glob('**/*.py'):
         if str(filepath).startswith('build/'):
             continue
         if filepath.name in ('_version.py', 'versioneer.py'):
@@ -140,7 +162,7 @@ def validate_project(install_requires):
                         "Missing BSD-3-Clause license in pyproject.toml")
 
     npm_packages = filter(lambda x: 'node_modules' not in str(x),
-                          pathlib.Path('.').glob('**/*/package.json'))
+                          base_dir.glob('**/*/package.json'))
     if npm_packages:
         import subprocess
 
