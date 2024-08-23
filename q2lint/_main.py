@@ -105,9 +105,8 @@ def validate_project(install_requires):
         errors.append('Missing LICENSE file')
 
     # setup some filepath shortcuts
-    base_dir = pathlib.Path('.')
-    pyproject_toml = base_dir.joinpath('pyproject.toml')
-    setup_py = base_dir.joinpath('setup.py')
+    pyproject_toml = pathlib.Path('pyproject.toml')
+    setup_py = pathlib.Path('setup.py')
 
     # Handle license file for pyproject.toml & setup.py
     if pyproject_toml.exists():
@@ -126,7 +125,7 @@ def validate_project(install_requires):
                     'license="BSD-3-Clause"' not in text):
                 errors.append("Missing BSD-3-Clause license in `setup.py`")
 
-    for filepath in base_dir.glob('**/*.py'):
+    for filepath in pathlib.Path('.').glob('**/*.py'):
         if str(filepath).startswith('build/'):
             continue
         if filepath.name in ('_version.py', 'versioneer.py'):
@@ -162,7 +161,7 @@ def validate_project(install_requires):
                         "Missing BSD-3-Clause license in pyproject.toml")
 
     npm_packages = filter(lambda x: 'node_modules' not in str(x),
-                          base_dir.glob('**/*/package.json'))
+                          pathlib.Path('.').glob('**/*/package.json'))
     if npm_packages:
         import subprocess
 
