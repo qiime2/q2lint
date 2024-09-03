@@ -18,6 +18,7 @@ setup(
         [console_scripts]
         q2lint=q2lint._main:main
     ''',
+    install_requires=['toml'],
     zip_safe=False,
     package_data={'q2lint': ['REF_LICENSE']},
 )
