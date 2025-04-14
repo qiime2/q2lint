@@ -166,6 +166,9 @@ def validate_project(install_requires):
         import subprocess
 
         for package in npm_packages:
+            # Skip if the package is the vendored q2view
+            if os.path.dirname(package) == "q2view":
+                continue
             pkg_path = package.parent
             install = 'cd %s && npm i --silent --progress false' % pkg_path
             cmd = subprocess.run(install, shell=True,
